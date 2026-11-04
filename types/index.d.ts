@@ -2,7 +2,6 @@
  * acme-client type definitions
  */
 
-import { AxiosInstance } from 'axios';
 import * as rfc8555 from './rfc8555';
 
 export type PrivateKeyBuffer = Buffer;
@@ -138,50 +137,19 @@ export interface RsaPublicJwk {
     n: string;
 }
 
-export interface EcdsaPublicJwk {
-    crv: string;
-    kty: string;
-    x: string;
-    y: string;
-}
-
 export interface CryptoInterface {
     createPrivateKey(keySize?: number): Promise<PrivateKeyBuffer>;
     createPrivateRsaKey(keySize?: number): Promise<PrivateKeyBuffer>;
-    createPrivateEcdsaKey(namedCurve?: 'P-256' | 'P-384' | 'P-521'): Promise<PrivateKeyBuffer>;
     getPublicKey(keyPem: PrivateKeyBuffer | PrivateKeyString | PublicKeyBuffer | PublicKeyString): PublicKeyBuffer;
-    getJwk(keyPem: PrivateKeyBuffer | PrivateKeyString | PublicKeyBuffer | PublicKeyString): RsaPublicJwk | EcdsaPublicJwk;
+    getJwk(keyPem: PrivateKeyBuffer | PrivateKeyString | PublicKeyBuffer | PublicKeyString): RsaPublicJwk;
     splitPemChain(chainPem: CertificateBuffer | CertificateString): string[];
     getPemBodyAsB64u(pem: CertificateBuffer | CertificateString): string;
     readCsrDomains(csrPem: CsrBuffer | CsrString): CertificateDomains;
     readCertificateInfo(certPem: CertificateBuffer | CertificateString): CertificateInfo;
     createCsr(data: CsrOptions, keyPem?: PrivateKeyBuffer | PrivateKeyString): Promise<[PrivateKeyBuffer, CsrBuffer]>;
-    createAlpnCertificate(authz: Authorization, keyAuthorization: string, keyPem?: PrivateKeyBuffer | PrivateKeyString): Promise<[PrivateKeyBuffer, CertificateBuffer]>;
-    isAlpnCertificateAuthorizationValid(certPem: CertificateBuffer | CertificateString, keyAuthorization: string): boolean;
 }
 
 export const crypto: CryptoInterface;
-
-/* TODO: LEGACY */
-export interface CryptoLegacyInterface {
-    createPrivateKey(size?: number): Promise<PrivateKeyBuffer>;
-    createPublicKey(key: PrivateKeyBuffer | PrivateKeyString): Promise<PublicKeyBuffer>;
-    getPemBody(str: string): string;
-    splitPemChain(str: string): string[];
-    getModulus(input: PrivateKeyBuffer | PrivateKeyString | PublicKeyBuffer | PublicKeyString | CertificateBuffer | CertificateString | CsrBuffer | CsrString): Promise<Buffer>;
-    getPublicExponent(input: PrivateKeyBuffer | PrivateKeyString | PublicKeyBuffer | PublicKeyString | CertificateBuffer | CertificateString | CsrBuffer | CsrString): Promise<Buffer>;
-    readCsrDomains(csr: CsrBuffer | CsrString): Promise<CertificateDomains>;
-    readCertificateInfo(cert: CertificateBuffer | CertificateString): Promise<CertificateInfo>;
-    createCsr(data: CsrOptions, key?: PrivateKeyBuffer | PrivateKeyString): Promise<[PrivateKeyBuffer, CsrBuffer]>;
-}
-
-export const forge: CryptoLegacyInterface;
-
-/**
- * Axios
- */
-
-export const axios: AxiosInstance;
 
 /**
  * Logger

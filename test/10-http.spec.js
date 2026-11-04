@@ -41,6 +41,21 @@ describe('http', () => {
         assert.strictEqual(resp.data, 'ok');
     });
 
+    it('should follow redirects', async () => {
+        nock(endpoint).get('/first').reply(302, '', { Location: '/second' });
+        nock(endpoint).get('/second').reply(200, 'ok');
+        const resp = await testClient.request(`${endpoint}/first`, 'get');
+
+        assert.strictEqual(resp.status, 200);
+        assert.strictEqual(resp.data, 'ok');
+    });
+
+    it('should preserve the timeout error used by HFS', async () => {
+        nock(endpoint).get('/slow').delayConnection(50).reply(200, 'ok');
+
+        await assert.isRejected(axios.get(`${endpoint}/slow`, { timeout: 10 }), /Timeout/);
+    });
+
     /**
      * User-Agent
      */

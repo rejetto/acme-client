@@ -2,8 +2,6 @@
  * ACME logger
  */
 
-const debug = require('debug')('acme-client');
-
 let logger = () => {};
 
 /**
@@ -23,6 +21,5 @@ exports.setLogger = (fn) => {
  */
 
 exports.log = (msg) => {
-    debug(msg);
     logger(msg);
 };

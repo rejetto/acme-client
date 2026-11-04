@@ -31,13 +31,6 @@ exports.directory = {
  */
 
 exports.crypto = require('./crypto');
-exports.forge = require('./crypto/forge');
-
-/**
- * Axios
- */
-
-exports.axios = require('./axios');
 
 /**
  * Logger

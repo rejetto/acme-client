@@ -1,24 +1,21 @@
 {
-    "name": "acme-client",
-    "description": "Simple and unopinionated ACME client",
+    "name": "@rejetto/acme-client",
+    "description": "Small ACME client tailored for HFS",
     "author": "nmorsman",
-    "version": "5.4.0",
+    "version": "5.4.0-hfs.0",
+    "private": true,
     "main": "src/index.js",
     "types": "types/index.d.ts",
     "license": "MIT",
     "homepage": "https://github.com/publishlab/node-acme-client",
     "engines": {
-        "node": ">= 16"
+        "node": ">= 19.6"
     },
     "files": [
         "src",
         "types"
     ],
     "dependencies": {
-        "@peculiar/x509": "^1.11.0",
-        "asn1js": "^3.0.5",
-        "axios": "^1.7.2",
-        "debug": "^4.3.5",
         "node-forge": "^1.3.1"
     },
     "devDependencies": {
@@ -38,7 +35,7 @@
         "lint": "eslint .",
         "lint-types": "tsd",
         "prepublishOnly": "npm run build-docs",
-        "test": "mocha -t 60000 \"test/setup.js\" \"test/**/*.spec.js\""
+        "test": "node node_modules/mocha/bin/mocha.js -t 60000 test/setup.js test/10-logger.spec.js test/10-http.spec.js test/10-util.spec.js test/20-crypto-legacy.spec.js test/20-crypto-hfs.spec.js"
     },
     "repository": {
         "type": "git",

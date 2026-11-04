@@ -222,7 +222,7 @@ exports.getPublicExponent = async (input) => {
  * ```
  */
 
-exports.readCsrDomains = async (csr) => {
+exports.readCsrDomains = (csr) => {
     if (!Buffer.isBuffer(csr)) {
         csr = Buffer.from(csr);
     }
@@ -250,7 +250,7 @@ exports.readCsrDomains = async (csr) => {
  * ```
  */
 
-exports.readCertificateInfo = async (cert) => {
+exports.readCertificateInfo = (cert) => {
     if (!Buffer.isBuffer(cert)) {
         cert = Buffer.from(cert);
     }
