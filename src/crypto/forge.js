@@ -91,7 +91,7 @@ function parseDomains(obj) {
     }
 
     if (altNamesDict) {
-        altNames = altNamesDict.map((a) => a.value);
+        altNames = altNamesDict.map((a) => a.ip || a.value);
     }
 
     return {
@@ -322,10 +322,9 @@ function createCsrSubject(subjectObj) {
  */
 
 function formatCsrAltNames(altNames) {
-    return altNames.map((value) => {
-        const type = net.isIP(value) ? 7 : 2;
-        return { type, value };
-    });
+    return altNames.map((value) => (net.isIP(value)
+        ? { type: 7, ip: value }
+        : { type: 2, value }));
 }
 
 /**

@@ -3,6 +3,7 @@
  */
 
 const { randomUUID: uuid } = require('crypto');
+const http = require('http');
 const { assert } = require('chai');
 const nock = require('nock');
 const axios = require('./../src/axios');
@@ -54,6 +55,40 @@ describe('http', () => {
         nock(endpoint).get('/slow').delayConnection(50).reply(200, 'ok');
 
         await assert.isRejected(axios.get(`${endpoint}/slow`, { timeout: 10 }), /Timeout/);
+    });
+
+    it('should reject truncated responses', async () => {
+        const { retryMaxAttempts } = axios.defaults.acmeSettings;
+        const server = http.createServer((req, res) => {
+            res.writeHead(200, { 'Content-Length': 100 });
+            res.write('partial');
+            const { socket } = res;
+            setTimeout(() => socket.destroy(), 10);
+        });
+        await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
+        axios.defaults.acmeSettings.retryMaxAttempts = 0;
+
+        try {
+            const { port } = server.address();
+            await assert.isRejected(axios.get(`http://127.0.0.1:${port}`), /aborted/i);
+        }
+        finally {
+            axios.defaults.acmeSettings.retryMaxAttempts = retryMaxAttempts;
+            await new Promise((resolve) => { server.close(resolve); });
+        }
+    });
+
+    it('should use a custom transport', async () => {
+        let request;
+        const transport = async (config) => {
+            request = config;
+            return { status: 200, headers: {}, data: 'custom' };
+        };
+        const client = new HttpClient(undefined, undefined, {}, transport);
+        const response = await client.request(endpoint, 'get');
+
+        assert.strictEqual(request.url, endpoint);
+        assert.strictEqual(response.data, 'custom');
     });
 
     /**

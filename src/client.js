@@ -34,6 +34,7 @@ const defaultOpts = {
     accountKey: undefined,
     accountUrl: null,
     externalAccountBinding: {},
+    transport: undefined,
     backoffAttempts: 10,
     backoffMin: 5000,
     backoffMax: 30000,
@@ -50,6 +51,7 @@ const defaultOpts = {
  * @param {object} [opts.externalAccountBinding]
  * @param {string} [opts.externalAccountBinding.kid] External account binding KID
  * @param {string} [opts.externalAccountBinding.hmacKey] External account binding HMAC key
+ * @param {function} [opts.transport] Custom single-request HTTP transport
  * @param {number} [opts.backoffAttempts] Maximum number of backoff attempts, default: `10`
  * @param {number} [opts.backoffMin] Minimum backoff attempt delay in milliseconds, default: `5000`
  * @param {number} [opts.backoffMax] Maximum backoff attempt delay in milliseconds, default: `30000`
@@ -100,7 +102,7 @@ class AcmeClient {
             max: this.opts.backoffMax,
         };
 
-        this.http = new HttpClient(this.opts.directoryUrl, this.opts.accountKey, this.opts.externalAccountBinding);
+        this.http = new HttpClient(this.opts.directoryUrl, this.opts.accountKey, this.opts.externalAccountBinding, this.opts.transport);
         this.api = new AcmeApi(this.http, this.opts.accountUrl);
     }
 

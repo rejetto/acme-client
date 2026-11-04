@@ -35,10 +35,27 @@ export interface ClientOptions {
     accountKey: PrivateKeyBuffer | PrivateKeyString;
     accountUrl?: string;
     externalAccountBinding?: ClientExternalAccountBindingOptions;
+    transport?: HttpTransport;
     backoffAttempts?: number;
     backoffMin?: number;
     backoffMax?: number;
 }
+
+export interface HttpRequestOptions {
+    url: string;
+    method?: string;
+    headers?: Record<string, string | number | string[] | undefined>;
+    data?: string | Buffer | object;
+    timeout?: number;
+}
+
+export interface HttpResponse {
+    status: number;
+    headers: Record<string, string | string[] | undefined>;
+    data: unknown;
+}
+
+export type HttpTransport = (options: HttpRequestOptions) => Promise<HttpResponse>;
 
 export interface ClientExternalAccountBindingOptions {
     kid: string;

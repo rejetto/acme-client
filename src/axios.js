@@ -50,6 +50,8 @@ function requestOnce(config, redirects = 0) {
             }
 
             const chunks = [];
+            res.once('aborted', () => reject(Object.assign(new Error('Response aborted'), { code: 'ECONNRESET' })));
+            res.once('error', reject);
             res.on('data', (chunk) => chunks.push(chunk));
             res.on('end', () => {
                 const text = Buffer.concat(chunks).toString();
@@ -95,11 +97,11 @@ async function waitToRetry(url, attempt, code, retryAfterHeader) {
     await new Promise((resolve) => { setTimeout(resolve, delay * 1000); });
 }
 
-async function request(config, retryAttempt = 0) {
+async function request(config, transport = requestOnce, retryAttempt = 0) {
     let response;
 
     try {
-        response = await requestOnce(config);
+        response = await transport(config);
     }
     catch (error) {
         const noMoreRetries = retryAttempt >= defaults.acmeSettings.retryMaxAttempts;
@@ -107,13 +109,13 @@ async function request(config, retryAttempt = 0) {
             throw error;
         }
         await waitToRetry(config.url, retryAttempt + 1, error.code);
-        return request(config, retryAttempt + 1);
+        return request(config, transport, retryAttempt + 1);
     }
 
     const retryableStatus = response.status === 429 || (response.status >= 500 && response.status <= 599);
     if (retryableStatus && retryAttempt < defaults.acmeSettings.retryMaxAttempts) {
         await waitToRetry(config.url, retryAttempt + 1, `HTTP ${response.status}`, response.headers['retry-after']);
-        return request(config, retryAttempt + 1);
+        return request(config, transport, retryAttempt + 1);
     }
 
     const validateStatus = config.validateStatus === undefined

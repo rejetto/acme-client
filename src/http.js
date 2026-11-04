@@ -13,16 +13,18 @@ const axios = require('./axios');
  * @class
  * @param {string} directoryUrl ACME directory URL
  * @param {buffer} accountKey PEM encoded account private key
- * @param {object} [opts.externalAccountBinding]
- * @param {string} [opts.externalAccountBinding.kid] External account binding KID
- * @param {string} [opts.externalAccountBinding.hmacKey] External account binding HMAC key
+ * @param {object} [externalAccountBinding]
+ * @param {string} [externalAccountBinding.kid] External account binding KID
+ * @param {string} [externalAccountBinding.hmacKey] External account binding HMAC key
+ * @param {function} [transport] Custom single-request HTTP transport
  */
 
 class HttpClient {
-    constructor(directoryUrl, accountKey, externalAccountBinding = {}) {
+    constructor(directoryUrl, accountKey, externalAccountBinding, transport) {
         this.directoryUrl = directoryUrl;
         this.accountKey = accountKey;
-        this.externalAccountBinding = externalAccountBinding;
+        this.externalAccountBinding = externalAccountBinding || {};
+        this.transport = transport;
 
         this.maxBadNonceRetries = 5;
         this.jwk = null;
@@ -55,7 +57,7 @@ class HttpClient {
 
         /* Request */
         log(`HTTP request: ${method} ${url}`);
-        const resp = await axios.request(opts);
+        const resp = await axios.request(opts, this.transport);
 
         log(`RESP ${resp.status} ${method} ${url}`);
         return resp;

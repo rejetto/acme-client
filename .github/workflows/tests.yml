@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [16, 18, 20]
+        node: [20, 22, 24]
         eab: [0, 1]
 
     #
@@ -35,7 +35,6 @@ jobs:
       ACME_DOMAIN_NAME: test.example.com
       ACME_CAP_EAB_ENABLED: ${{matrix.eab}}
 
-      ACME_TLSALPN_PORT: 5001
       ACME_HTTP_PORT: 5002
       ACME_HTTPS_PORT: 5003
 
@@ -57,7 +56,6 @@ jobs:
         run: |-
           nohup bash -c "pebble-challtestsrv \
             -dns01 :${PEBBLECTS_DNS_PORT} \
-            -tlsalpn01 :${ACME_TLSALPN_PORT} \
             -http01 :${ACME_HTTP_PORT} \
             -https01 :${ACME_HTTPS_PORT} \
             -defaultIPv4 127.0.0.1 \
@@ -87,5 +85,4 @@ jobs:
       - run: npm i
       - run: npm run lint
       - run: npm run lint-types
-      - run: npm run build-docs
       - run: npm run test

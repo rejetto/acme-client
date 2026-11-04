@@ -39,6 +39,8 @@ const certificate = await client.auto({
 });
 ```
 
+Applications with their own HTTP stack can pass a `transport` function to the client. The client keeps ACME retries and status handling around that transport. HFS uses this hook so certificate requests inherit its configured outbound proxy and network interface.
+
 ## License
 
 MIT. Copyright and license terms from the upstream project are retained in [LICENSE](LICENSE).

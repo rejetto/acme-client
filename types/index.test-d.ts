@@ -2,15 +2,17 @@
  * acme-client type definition tests
  */
 
-import * as acme from 'acme-client';
+import * as acme from '.';
 
 (async () => {
     /* Client */
     const accountKey = await acme.crypto.createPrivateKey();
 
+    const transport: acme.HttpTransport = async () => ({ status: 200, headers: {}, data: {} });
     const client = new acme.Client({
         accountKey,
-        directoryUrl: acme.directory.letsencrypt.staging
+        directoryUrl: acme.directory.letsencrypt.staging,
+        transport
     });
 
     /* Account */
