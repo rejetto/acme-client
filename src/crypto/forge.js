@@ -13,6 +13,10 @@ const forge = require('node-forge');
 
 const generateKeyPair = promisify(forge.pki.rsa.generateKeyPair);
 
+function asPemString(input) {
+    return Buffer.isBuffer(input) ? input.toString() : input;
+}
+
 /**
  * Attempt to parse forge object from PEM encoded string
  *
@@ -22,6 +26,7 @@ const generateKeyPair = promisify(forge.pki.rsa.generateKeyPair);
  */
 
 function forgeObjectFromPem(input) {
+    input = asPemString(input);
     const msg = forge.pem.decode(input)[0];
     let result;
 
@@ -133,7 +138,7 @@ exports.createPrivateKey = createPrivateKey;
  */
 
 exports.createPublicKey = async (key) => {
-    const privateKey = forge.pki.privateKeyFromPem(key);
+    const privateKey = forge.pki.privateKeyFromPem(asPemString(key));
     const publicKey = forge.pki.rsa.setPublicKey(privateKey.n, privateKey.e);
     const pemKey = forge.pki.publicKeyToPem(publicKey);
     return Buffer.from(pemKey);
@@ -148,7 +153,7 @@ exports.createPublicKey = async (key) => {
  */
 
 exports.getPemBody = (str) => {
-    const msg = forge.pem.decode(str)[0];
+    const msg = forge.pem.decode(asPemString(str))[0];
     return forge.util.encode64(msg.body);
 };
 
@@ -159,7 +164,7 @@ exports.getPemBody = (str) => {
  * @returns {string[]} Array of PEM bodies
  */
 
-exports.splitPemChain = (str) => forge.pem.decode(str).map(forge.pem.encode);
+exports.splitPemChain = (str) => forge.pem.decode(asPemString(str)).map(forge.pem.encode);
 
 /**
  * Get modulus
@@ -227,7 +232,7 @@ exports.readCsrDomains = (csr) => {
         csr = Buffer.from(csr);
     }
 
-    const obj = forge.pki.certificationRequestFromPem(csr);
+    const obj = forge.pki.certificationRequestFromPem(asPemString(csr));
     return parseDomains(obj);
 };
 
@@ -255,7 +260,7 @@ exports.readCertificateInfo = (cert) => {
         cert = Buffer.from(cert);
     }
 
-    const obj = forge.pki.certificateFromPem(cert);
+    const obj = forge.pki.certificateFromPem(asPemString(cert));
     const issuerCn = (obj.issuer.attributes || []).find((a) => a.name === 'commonName');
 
     return {
@@ -393,7 +398,7 @@ exports.createCsr = async (data, key = null) => {
     const csr = forge.pki.createCertificationRequest();
 
     /* Public key */
-    const privateKey = forge.pki.privateKeyFromPem(key);
+    const privateKey = forge.pki.privateKeyFromPem(asPemString(key));
     const publicKey = forge.pki.rsa.setPublicKey(privateKey.n, privateKey.e);
     csr.publicKey = publicKey;
 
