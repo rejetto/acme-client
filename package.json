@@ -2,7 +2,7 @@
     "name": "@rejetto/acme-client",
     "description": "Small ACME client tailored for HFS",
     "author": "nmorsman",
-    "version": "5.4.0-hfs.1",
+    "version": "1.0.0",
     "main": "src/index.js",
     "types": "types/index.d.ts",
     "license": "MIT",
